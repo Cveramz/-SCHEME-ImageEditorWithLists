@@ -32,7 +32,80 @@
 ;Descripción: Función constructora de imagenes, la cual puede ser
 ;bitmap, hexmap o pixmap.
 ;Entradas: Width (int), Height (int), Información pixeles (lista o listas)
-;Recorrido: imagen
+;Salida imagen
 
 (define (image Width Height . InfPixs)
   (list Width Height InfPixs))
+
+
+;-------PERTENENCIA-------
+
+
+
+
+;Pertenencia pixel bit
+;Descripción: Funcione que permite determinar si es un pixel tipo bit
+;Entradas: list
+;Salida: boolean
+
+(define (bit? data)
+  (if (not(null? data))
+      ;#t
+      (if (number? (car data)) ;X puede ser cualquier numero
+          (if (number? (car(cdr data))) ; Y puede ser cualquier numero
+              (if (or (eq? (car (cddr data)) 0) (eq? (car (cddr data)) 1) )
+                  (if (number? (car (cdddr data)))
+                      #t
+                      #f
+                      )
+                  #f
+                  )
+              #f
+              )
+          #f
+          )
+      #f
+      )
+  )
+
+
+;Pertenencia pixel rgb
+;Descripción: Funcione que permite determinar si es un pixel de tipo rgb
+;Entradas: list
+;Salida: boolean
+
+(define (rgb? data)
+  (if (not(null? data))
+      ;#t
+      (if (number? (car data)) ;X puede ser cualquier numero
+          (if (number? (car(cdr data))) ; Y puede ser cualquier numero
+              (if (and (< -1 (car(cddr data))) (> 256 (car(cddr data)) )) ;r
+                  (if (and (< -1 (car(cdddr data))) (> 256 (car(cdddr data)) )) ;g
+                      (if (and (< -1 (car(cddddr data))) (> 256 (car(cddddr data))));b
+                          (if (number? (car(cdr(cddddr data))))
+                              #t
+                              #f
+                              )
+                          #f
+                          )
+                      #f
+                      )
+                  #f
+                  )
+              #f
+              )
+          #f
+          )
+      #f
+      )
+  )
+
+
+
+
+
+
+;Pertenencia bitmap
+;Descripción: Funcione que permite determinar si la imagen es un bitmap-d
+;Entradas: image
+;Salida: boolean
