@@ -44,7 +44,7 @@
 
 
 ;Pertenencia pixel bit
-;Descripción: Funcione que permite determinar si es un pixel tipo bit
+;Descripción: Función que permite determinar si es un pixel tipo bit
 ;Entradas: list
 ;Salida: boolean
 
@@ -70,7 +70,7 @@
 
 
 ;Pertenencia pixel rgb
-;Descripción: Funcione que permite determinar si es un pixel de tipo rgb
+;Descripción: Función que permite determinar si es un pixel de tipo rgb
 ;Entradas: list
 ;Salida: boolean
 
@@ -103,9 +103,33 @@
 
 
 
+;Pertenencia pixel hex
+;Descripción: Función que permite determinar si es un pixel de tipo hex
+;Entradas: list
+;Salida: boolean
+
+(define (hex? data)
+  (if (not(null? data))
+      (if (number? (car data));x
+          (if (number? (car(cdr data)));y
+              (if (string? (car(cddr data)));hex
+                  (if (number? (car(cdddr data)))
+                      #t
+                      #f
+                      )
+                  #f
+                  )
+              #f
+              )
+          #f
+          )
+      #f
+      )
+  )
+
 
 
 ;Pertenencia bitmap
-;Descripción: Funcione que permite determinar si la imagen es un bitmap-d
+;Descripción: Función que permite determinar si la imagen es un bitmap-d
 ;Entradas: image
 ;Salida: boolean
