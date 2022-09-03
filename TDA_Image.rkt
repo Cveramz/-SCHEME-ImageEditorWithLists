@@ -49,7 +49,7 @@
 ;Salida: boolean
 
 (define (bit? data)
-  (if (not(null? data))
+  (if (and (not(null? data)) (eq? (length data) 4) )
       ;#t
       (if (number? (car data)) ;X puede ser cualquier numero
           (if (number? (car(cdr data))) ; Y puede ser cualquier numero
@@ -75,7 +75,7 @@
 ;Salida: boolean
 
 (define (rgb? data)
-  (if (not(null? data))
+  (if (and (not(null? data)) (eq? (length data) 6) ) ; es nulo? y es de tamaño 6?
       ;#t
       (if (number? (car data)) ;X puede ser cualquier numero
           (if (number? (car(cdr data))) ; Y puede ser cualquier numero
@@ -109,7 +109,7 @@
 ;Salida: boolean
 
 (define (hex? data)
-  (if (not(null? data))
+  (if (and (not(null? data)) (eq? (length data) 4) )
       (if (number? (car data));x
           (if (number? (car(cdr data)));y
               (if (string? (car(cddr data)));hex
@@ -133,3 +133,43 @@
 ;Descripción: Función que permite determinar si la imagen es un bitmap-d
 ;Entradas: image
 ;Salida: boolean
+
+
+(define (bitmap? image)
+  (if (and (number?(car image)) (number?(car(cdr image))))
+      (if (eq? (length (car(cddr image))) (length (filter bit? (car(cddr image)))))
+          #t
+          #f
+          )
+      ;(filter bit? (car(cddr image)))
+      #f
+      )
+  )
+
+;Pertenencia pixmap (Conformado por pixeles RGB)
+;Descripción: Función que permite determinar si la imagen es un bitrgb-d
+;Entradas: image
+;Salida: boolean
+(define (pixmap? image)
+  (if (and (number?(car image)) (number?(car(cdr image))))
+      (if (eq? (length (car(cddr image))) (length (filter rgb? (car(cddr image)))))
+          #t
+          #f
+          )
+      #f
+      )
+  )
+
+;Pertenencia hexmap
+;Descripción: Función que permite determinar si la imagen es un hexmap-d
+;Entradas: image
+;Salida: boolean
+(define (hexmap? image)
+  (if (and (number?(car image)) (number?(car(cdr image))))
+      (if (eq? (length (car(cddr image))) (length (filter hex? (car(cddr image)))))
+          #t
+          #f
+          )
+      #f
+      )
+  )
