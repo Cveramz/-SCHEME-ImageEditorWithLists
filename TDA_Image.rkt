@@ -173,3 +173,33 @@
       #f
       )
   )
+
+
+
+
+;-------SELECTORES-------
+
+
+
+;Selector ancho
+;Descrición: Función que obtiene el ancho de una imagen
+;Entradas: image
+;Salida: int
+(define (getAncho image)
+  (car image)
+  )
+
+
+;Selector alto
+;Descrición: Función que obtiene el alto de una imagen
+;Entradas: image
+;Salida: int
+(define (getAlto image)
+  (car (cdr image))
+  )
+
+
+
+
+
+
