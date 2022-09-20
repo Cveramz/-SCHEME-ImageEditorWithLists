@@ -202,4 +202,35 @@
 
 
 
+;-------MODIFICADORES-------
+
+
+
+
+
+
+;-------OTROS-------
+
+;Función que elimina los n primeros elementos de una lista
+;Entradas: n (int), lista (lista)
+;Salida: lista
+
+(define (elimina-n lista n)
+  (if (eq? n 0)
+      lista
+      (elimina-n (cdr lista) (- n 1))
+      )
+  )
+
+
+;Función que elimina los n ultimos elementos de una lista
+;Entradas: n (int), lista (lista)
+;Salida: lista
+
+(define (elimina-n-ult lista n)
+  (if (eq? n 0)
+      lista
+      (elimina-n-ult (reverse (cdr (reverse lista))) (- n 1))
+      )
+  )
 
