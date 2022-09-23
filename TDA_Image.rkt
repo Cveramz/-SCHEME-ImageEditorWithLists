@@ -18,93 +18,6 @@
 
 
 
-
-;Pertenencia pixel bit
-;Descripción: Función que permite determinar si es un pixel tipo bit
-;Entradas: list
-;Salida: boolean
-
-(define (bit? data)
-  (if (and (not(null? data)) (eq? (length data) 4) )
-      ;#t
-      (if (number? (car data)) ;X puede ser cualquier numero
-          (if (number? (car(cdr data))) ; Y puede ser cualquier numero
-              (if (or (eq? (car (cddr data)) 0) (eq? (car (cddr data)) 1) )
-                  (if (number? (car (cdddr data)))
-                      #t
-                      #f
-                      )
-                  #f
-                  )
-              #f
-              )
-          #f
-          )
-      #f
-      )
-  )
-
-
-;Pertenencia pixel rgb
-;Descripción: Función que permite determinar si es un pixel de tipo rgb
-;Entradas: list
-;Salida: boolean
-
-(define (rgb? data)
-  (if (and (not(null? data)) (eq? (length data) 6) ) ; es nulo? y es de tamaño 6?
-      ;#t
-      (if (number? (car data)) ;X puede ser cualquier numero
-          (if (number? (car(cdr data))) ; Y puede ser cualquier numero
-              (if (and (< -1 (car(cddr data))) (> 256 (car(cddr data)) )) ;r
-                  (if (and (< -1 (car(cdddr data))) (> 256 (car(cdddr data)) )) ;g
-                      (if (and (< -1 (car(cddddr data))) (> 256 (car(cddddr data))));b
-                          (if (number? (car(cdr(cddddr data))))
-                              #t
-                              #f
-                              )
-                          #f
-                          )
-                      #f
-                      )
-                  #f
-                  )
-              #f
-              )
-          #f
-          )
-      #f
-      )
-  )
-
-
-
-
-;Pertenencia pixel hex
-;Descripción: Función que permite determinar si es un pixel de tipo hex
-;Entradas: list
-;Salida: boolean
-
-(define (hex? data)
-  (if (and (not(null? data)) (eq? (length data) 4) )
-      (if (number? (car data));x
-          (if (number? (car(cdr data)));y
-              (if (string? (car(cddr data)));hex
-                  (if (number? (car(cdddr data)))
-                      #t
-                      #f
-                      )
-                  #f
-                  )
-              #f
-              )
-          #f
-          )
-      #f
-      )
-  )
-
-
-
 ;Pertenencia bitmap
 ;Descripción: Función que permite determinar si la imagen es un bitmap-d
 ;Entradas: image
@@ -151,6 +64,22 @@
   )
 
 
+;Compressed?
+;Descripción: Función que determina si una imagen está comprimida.
+;Entrada: Image
+;Salida: Boolean
+
+(define (compressed? image)
+  (if (not
+       (eq?
+        (* (car image) (car(cdr image))) (length (car(cddr image)))
+        ))
+      #t
+      #f
+    )
+  )
+
+
 
 
 ;-------SELECTORES-------
@@ -187,6 +116,8 @@
 
 ;-------OTROS-------
 
+
+
 ;Función que elimina los n primeros elementos de una lista
 ;Entradas: n (int), lista (lista)
 ;Salida: lista
@@ -210,3 +141,9 @@
       )
   )
 
+
+
+(require "TDA_Pixbit.rkt")
+(require "TDA_Pixhex.rkt")
+(require "TDA_Pixrgb.rkt")
+(provide (all-defined-out))
