@@ -103,17 +103,40 @@
   (car (cdr image))
   )
 
+;Selector pixeles
+;Descrición: Función que obtiene los pixeles de una imagen
+;Entradas: image
+;Salida: list
+(define (getPixeles image)
+  (car (cddr image))
+  )
 
-(define (obtener-fila image n)
+
+(define (get-fila image n)
   (obtener-elementos (caddr image) (* n (car image)) (car image))
   )
 
-;EJEMPLO DE LLAMADO: (obtener-fila (image 2 2 (pixbit-d  0 0 1 10) (pixbit-d  0 1 0 20) (pixbit-d 1 0 0 30) (pixbit-d 1 1 1 4)) 0)
+;EJEMPLO DE LLAMADO: (get-fila (image 2 2 (pixbit-d  0 0 1 10) (pixbit-d  0 1 0 20) (pixbit-d 1 0 0 30) (pixbit-d 1 1 1 4)) 0)
 
 
 ;-------MODIFICADORES-------
 
+;Modificador de ancho
+;Descripción: Función que modifica el ancho de una imagen
+;Entradas: image, int
+;Salida: image
+(define (setAncho image nuevoAncho)
+  (image nuevoAncho (car(cdr image)) (car(cddr image)))
+  )
 
+
+;Modificador de alto
+;Descripción: Función que modifica el alto de una imagen
+;Entradas: image, int
+;Salida: image
+(define (setAlto image nuevoAlto)
+  (image (car image) nuevoAlto (car(cddr image)))
+  )
 
 
 
@@ -121,19 +144,24 @@
 ;Descripción: Función que invierte una imagen horizontalmente
 ;Entradas: image
 ;Salida: image
+(define (flipH image)
+  (define (flipH-iter image newImage counter)
+    (if (eq? counter (car(cdr image)))
+        newImage
+        (flipH-iter image (append newImage (reverse (get-fila image counter))) (+ counter 1))
+        )
+    )
+  (flipH-iter image '() 0)
+)
 
-;Pasar de esto:
-;(2 3 
-;( (0 0 1 1) (0 1 1 2)
-; (1 0 2 1) (1 1 2 2)
-; (1 1 3 1) (1 1 3 2)) )
+;Invertir verticalmente
+;Descripción: Función que invierte una imagen verticalmente
+;Entradas: image
+;Salida: image
+(define (flipV image)
+  (reverse (flipH image))
+)
 
-;A esto:
-
-;(2 3
-;(0 1 1 2) (0 0 1 1)
-;(1 0 2 2) (1 1 2 1)
-;(1 1 3 2) (1 1 3 1))
 
 
 
@@ -163,54 +191,33 @@
       )
   )
 
-;Append a final de lista.
-;Descripción: Función que agrega un elemento al final de una lista.
-;Entradas: Lista, Elemento
-;Salida: Lista con el elemento agregado al final
-;Tipo de recursión: Recursión Natural.
-(define (append-final lista elemento)
-  (if (null? lista)
-      (list elemento)
-      (cons (car lista) (append-final (cdr lista) elemento))
-      )
-  )
-
-;Agregar elementos de una lista a otra.
-;Descripción: Función que agrega los elementos de una lista a otra.
-;Entradas: Lista, Lista
-;Salida: Lista con los elementos agregados
-;Tipo de recursión: Recursión natural.
-(define (agregar-elementos lista1 lista2)
-  (if (null? lista1)
-      lista2
-      (agregar-elementos (cdr lista1) (append-final lista2 (car lista1)))
-      )
-  )
 
 
-;Agregar fila invertida a una lista.
-;Descripción: Función que agrega una fila invertida a una lista.
-;Entradas: Lista posición fila -1.
-;Salida: Lista con la fila invertida agregada.
-(define (agregar-fila-invertida image n)
-  (agregar-elementos (reverse(obtener-fila image n)) (list))
-  )
 
+
+
+
+#|
+(display "IMG1:\n")
 (define img1
-  (image 2 2 (pixbit-d 0 0 1 10) (pixbit-d 0 1 0 20) (pixbit-d 1 0 0 30) (pixbit-d 1 1 1 4))
-)
-;IMG1 = (2 2 (0 0 1 10) (0 1 0 20) (1 0 0 30) (1 1 1 4))
+  (image 2 3 (pixbit-d 0 0 1 10) (pixbit-d 0 0 1 20)
+         (pixbit-d 0 0 1 30) (pixbit-d 0 0 1 40)
+         (pixbit-d 0 0 1 50) (pixbit-d 0 0 1 60))
+  )
 img1
-(agregar-fila-invertida img1 0)
 
-;Crear función que reciba una imagen y devuelva una lista con las filas invertidas.
-;Descripción: Función que recibe una imagen y devuelve una lista con las filas invertidas.
-;Entradas: ListaPixeles, largo, alto, lista.
-;Salida: Lista con las filas invertidas.
 
-;(define (invertir-filas infPixeles largo alto newList)
+(display "IMG1 FLIPEADO:\n")
+
+(flipH img1)
+
+(display "IMG1 FLIPEADO VERTICALMENTE:\n")
+
+(flipV img1)
+|#
+
 
 (require "TDA_Pixbit.rkt")
-(require "TDA_Pixhex.rkt")
 (require "TDA_Pixrgb.rkt")
+(require "TDA_Pixhex.rkt")
 (provide (all-defined-out))
