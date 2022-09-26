@@ -116,7 +116,8 @@
   (obtener-elementos (caddr image) (* n (car image)) (car image))
   )
 
-;EJEMPLO DE LLAMADO: (get-fila (image 2 2 (pixbit-d  0 0 1 10) (pixbit-d  0 1 0 20) (pixbit-d 1 0 0 30) (pixbit-d 1 1 1 4)) 0)
+
+
 
 
 ;-------MODIFICADORES-------
@@ -145,13 +146,13 @@
 ;Entradas: image
 ;Salida: image
 (define (flipH image)
-  (define (flipH-iter image newImage counter)
+  (define (flipH-interno image newImage counter)
     (if (eq? counter (car(cdr image)))
         newImage
-        (flipH-iter image (append newImage (reverse (get-fila image counter))) (+ counter 1))
+        (flipH-interno image (append newImage (reverse (get-fila image counter))) (+ counter 1))
         )
     )
-  (flipH-iter image '() 0)
+  (flipH-interno image '() 0)
 )
 
 ;Invertir verticalmente
@@ -162,6 +163,27 @@
   (reverse (flipH image))
 )
 
+;Recortar imagen
+;Descripción: Función que recorta una imagen
+;Entradas: image, int, int, int, int
+;Salida: image
+
+(define (crop image x1 y1 x2 y2)
+  ;x1 y1 son las coordenadas del pixel superior izquierdo
+  ;x2 y2 son las coordenadas del pixel inferior derecho
+  ;en caso que x1,y2,x2,y2 sean iguales se retorna solo un pixel
+  (define (crop-interno image newImage counter)
+    (if (eq? counter (car(cdr image)))
+        newImage
+        (if (and (>= counter y1) (<= counter y2))
+            (crop-interno image (append newImage (obtener-elementos (get-fila image counter) x1 (- x2 x1))) (+ counter 1))
+            (crop-interno image newImage (+ counter 1))
+            )
+        )
+    )
+  (crop-interno image '() 0)
+  )
+  
 
 
 
@@ -197,27 +219,8 @@
 
 
 
-#|
-(display "IMG1:\n")
-(define img1
-  (image 2 3 (pixbit-d 0 0 1 10) (pixbit-d 0 0 1 20)
-         (pixbit-d 0 0 1 30) (pixbit-d 0 0 1 40)
-         (pixbit-d 0 0 1 50) (pixbit-d 0 0 1 60))
-  )
-img1
 
-
-(display "IMG1 FLIPEADO:\n")
-
-(flipH img1)
-
-(display "IMG1 FLIPEADO VERTICALMENTE:\n")
-
-(flipV img1)
-|#
-
-
-(require "TDA_Pixbit.rkt")
-(require "TDA_Pixrgb.rkt")
-(require "TDA_Pixhex.rkt")
+(require "TDA_Pixbit_20816739-1_VeraRamirez.rkt")
+(require "TDA_Pixrgb_20816739-1_VeraRamirez.rkt")
+(require "TDA_Pixhex_20816739-1_VeraRamirez.rkt")
 (provide (all-defined-out))

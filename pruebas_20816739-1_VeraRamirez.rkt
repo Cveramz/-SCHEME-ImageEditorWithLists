@@ -1,9 +1,9 @@
 #lang scheme
 
-(require "TDA_Image.rkt")
-(require "TDA_Pixbit.rkt")
-(require "TDA_Pixrgb.rkt")
-(require "TDA_Pixhex.rkt")
+(require "TDA_Image_20816739-1_VeraRamirez.rkt")
+(require "TDA_Pixbit_20816739-1_VeraRamirez.rkt")
+(require "TDA_Pixrgb_20816739-1_VeraRamirez.rkt")
+(require "TDA_Pixhex_20816739-1_VeraRamirez.rkt")
 
 
 
@@ -29,6 +29,11 @@
   (image 5 1 (pixbit-d  0 0 1 10) (pixbit-d  0 0 1 20) (pixbit-d  0 0 1 30))
   )
 
+
+(define img5
+  (image 3 3 (pixbit-d  0 0 1 10) (pixbit-d  0 1 0 20) (pixbit-d 1 0 0 30) (pixbit-d 1 1 1 4) (pixbit-d 1 2 1 4) (pixbit-d 2 0 1 4) (pixbit-d 2 1 1 4) (pixbit-d 2 2 1 4) (pixbit-d 3 0 1 5))
+  )
+
 (display "imagen1 (Pixbit):\n")
 img1
 (display "imagen2 (Pixrgb):\n")
@@ -37,6 +42,8 @@ img2
 img3
 (display "imagen4 (Pixhex, comprimido):\n")
 img4
+(display "imagen5 (Pixbit 3x3):\n")
+img5
 
 
 
@@ -90,3 +97,12 @@ img4
 (flipV img2)
 (display "Ej img4\n")
 (flipV img4)
+
+;Modificador recortar imagen
+(display "Modificador recortar imagen:\n")
+(display "Ej img1\n")
+(crop img1 0 0 1 1)
+(display "Ej img2\n")
+(crop img2 0 0 1 1)
+(display "Ej img5\n")
+(crop img5 0 0 3 1)
