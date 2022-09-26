@@ -185,6 +185,21 @@
   )
   
 
+;Rotar imagen 90 grados
+;Descripción: rota la imágen 90° a la derecha. 
+;Entradas: image
+;Salida: image
+
+(define (rotate90 image)
+  (define (rotate90-interno image newImage counter)
+    (if (eq? counter (car image))
+        newImage
+        (rotate90-interno image (append newImage (reverse (obtener-elementos (getPixeles image) counter (car(cdr image))))) (+ counter 1))
+        )
+    )
+  (rotate90-interno image '() 0)
+  )
+
 
 
 
