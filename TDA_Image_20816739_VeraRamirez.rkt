@@ -13,6 +13,8 @@
 (define (image Width Height . InfPixs)
   (list Width Height InfPixs))
 
+(define (imageWithListPix Width Height ListPixels)
+  (list Width Height ListPixels))
 
 ;-------PERTENENCIA-------
 
@@ -169,38 +171,249 @@
 ;Salida: image
 
 (define (crop image x1 y1 x2 y2)
-  ;x1 y1 son las coordenadas del pixel superior izquierdo
-  ;x2 y2 son las coordenadas del pixel inferior derecho
-  ;en caso que x1,y2,x2,y2 sean iguales se retorna solo un pixel
-  (define (crop-interno image newImage counter)
-    (if (eq? counter (car(cdr image)))
-        newImage
-        (if (and (>= counter y1) (<= counter y2))
-            (crop-interno image (append newImage (obtener-elementos (get-fila image counter) x1 (- x2 x1))) (+ counter 1))
-            (crop-interno image newImage (+ counter 1))
-            )
-        )
-    )
-  (crop-interno image '() 0)
+  ;x1 y1 son las coordenadas del pixel inferior izquierdo
+  ;x2 y2 son las coordenadas del pixel superior derecho
+  ;osea, x1 es xMin, y1 es yMin, x2 es xMax, y2 es yMax
+  ;utilizaremos como filter la funcion pixelEnRango(pixel, xMin, xMax, yMin, yMax) que se importa
+  ;de el archivo tda_pixeles
+  (filter (lambda (pixel) (pixelEnRango pixel x1 x2 y1 y2)) (getPixeles image))
   )
-  
 
-;Rotar imagen 90 grados
-;Descripción: rota la imágen 90° a la derecha. 
+
+;Transformar imagen RGB a Hex
+;Descripción: Función que transforma una imagen RGB a Hex
 ;Entradas: image
 ;Salida: image
 
-(define (rotate90 image)
-  (define (rotate90-interno image newImage counter)
-    (if (eq? counter (car image))
-        newImage
-        (rotate90-interno image (append newImage (reverse (obtener-elementos (getPixeles image) counter (car(cdr image))))) (+ counter 1))
-        )
-    )
-  (rotate90-interno image '() 0)
+;Primero hagamos el listado de los colores en hexadecimal
+(define conversion-digitos (list "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+                                "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k"
+                "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v"
+                "w" "x" "y" "z"))
+
+
+;Ahora veremos lo de las divisiones
+;Primero dividimos por 16 para obtener el primer digito
+
+(define (resultadoDivision valor) (quotient valor 16))
+
+;Ahora obtenemos el resto de la division
+(define (resultadoResto valor) (remainder valor 16))
+
+;Ahora haremos la conversion de los colores
+(define (conversionColor color)
+  (string-append (list-ref conversion-digitos (resultadoDivision color))
+                 (list-ref conversion-digitos (resultadoResto color)))
+  )
+
+;Ahora haremos la conversion de los pixeles
+;EJEMPLO DE RGB: (pixrgb-d 1 1 40 40 40 40)
+(define (conversionPixel pixel)
+  (string-append (conversionColor (car (cddr pixel)))
+                 (conversionColor (car (cddr (cdr pixel))))
+                 (conversionColor (car (cddr (cddr pixel))))
+                 )
+  )
+
+;Ahora haremos la conversion de la imagen
+(define (conversionImagen image)
+  (map conversionPixel (getPixeles image))
+  )
+
+;Ahora finalmente crearemos la nueva imagen
+
+(define (imgRGB->imgHex image)
+  (imageWithListPix (getAncho image) (getAlto image) (conversionImagen image))
   )
 
 
+
+;Funcion de Histograma
+;Descripción: Función que crea un histograma a partir de una imagen
+;Entradas: image
+;Salida: list
+;===============================================================
+(define (histogram image)
+  ;Para el histograma debemos considerar solamente los colores de los pixeles
+  ;Por lo tanto primero debemos identificar los tipos de pixeles utilizando if
+  ;Luego debemos contar la cantidad de pixeles de cada tipo
+  ;Finalmente debemos crear una lista con los pixeles y sus cantidades
+
+  ;Primero identificamos el tipo de imagen, usando bitmap?, pixmap? y hexmap?
+
+  (if (bitmap? image)
+      (histogramaBitmap image)
+      (if (pixmap? image)
+          (histogramaPixmap image)
+          (histogramaHexmap image)
+          )
+      )
+  )
+
+(define (histogramaBitmap image)
+  ;Para el histograma de bitmap, debemos contar la cantidad de pixeles de cada color
+  ;Para esto debemos crear una lista con los colores de los pixeles
+  ;Luego debemos contar la cantidad de pixeles de cada color
+  ;Finalmente debemos crear una lista con los pixeles y sus cantidades
+
+  ;Primero creamos la lista de colores
+  (define (listaColores image)
+    (map (lambda (pixel) (car (cddr pixel))) (getPixeles image))
+    )
+
+  ;Ahora contamos la cantidad de pixeles de cada color
+  (define (contarColores listaColores)
+    (define (contarColores-interno listaColores listaContador)
+      (if (null? listaColores)
+          listaContador
+          (contarColores-interno (cdr listaColores) (append listaContador (list (contarColor (car listaColores) listaColores))))
+          )
+      )
+    (contarColores-interno listaColores '())
+    )
+
+  ;Ahora creamos la lista con los pixeles y sus cantidades
+  (define (listaPixeles listaColores listaContador)
+    (define (listaPixeles-interno listaColores listaContador listaPixeles)
+      (if (null? listaColores)
+          listaPixeles
+          (listaPixeles-interno (cdr listaColores) (cdr listaContador) (append listaPixeles (list (list (car listaColores) (car listaContador)))))
+          )
+      )
+    (listaPixeles-interno listaColores listaContador '())
+    )
+
+  ;Ahora creamos la lista con los pixeles y sus cantidades
+  (listaPixeles (listaColores image) (contarColores (listaColores image)))
+  )
+
+(define (contarColor color listaColores)
+  (define (contarColor-interno color listaColores contador)
+    (if (null? listaColores)
+        contador
+        (if (equal? color (car listaColores))
+            (contarColor-interno color (cdr listaColores) (+ contador 1))
+            (contarColor-interno color (cdr listaColores) contador)
+            )
+        )
+    )
+  (contarColor-interno color listaColores 0)
+  )
+
+(define (histogramaPixmap image)
+  ;Para el histograma de pixmap, debemos contar la cantidad de pixeles de cada color
+  ;Para esto debemos crear una lista con los colores de los pixeles
+  ;Luego debemos contar la cantidad de pixeles de cada color
+  ;Finalmente debemos crear una lista con los pixeles y sus cantidades
+
+  ;Primero creamos la lista de colores
+  (define (listaColores image)
+    (map (lambda (pixel) (car (cddr pixel))) (getPixeles image))
+    )
+
+  ;Ahora contamos la cantidad de pixeles de cada color
+  (define (contarColores listaColores)
+    (define (contarColores-interno listaColores listaContador)
+      (if (null? listaColores)
+          listaContador
+          (contarColores-interno (cdr listaColores) (append listaContador (list (contarColor (car listaColores) listaColores))))
+          )
+      )
+    (contarColores-interno listaColores '())
+    )
+
+  ;Ahora creamos la lista con los pixeles y sus cantidades
+  (define (listaPixeles listaColores listaContador)
+    (define (listaPixeles-interno listaColores listaContador listaPixeles)
+      (if (null? listaColores)
+          listaPixeles
+          (listaPixeles-interno (cdr listaColores) (cdr listaContador) (append listaPixeles (list (list (car listaColores) (car listaContador)))))
+          )
+      )
+    (listaPixeles-interno listaColores listaContador '())
+    )
+
+  ;Ahora creamos la lista con los pixeles y sus cantidades
+  (listaPixeles (listaColores image) (contarColores (listaColores image)))
+  )
+
+(define (histogramaHexmap image)
+  ;Para el histograma de hexmap, debemos contar la cantidad de pixeles de cada color
+  ;Para esto debemos crear una lista con los colores de los pixeles
+  ;Luego debemos contar la cantidad de pixeles de cada color
+  ;Finalmente debemos crear una lista con los pixeles y sus cantidades
+
+  ;Primero creamos la lista de colores
+  (define (listaColores image)
+    (map (lambda (pixel) (car (cddr pixel))) (getPixeles image))
+    )
+
+  ;Ahora contamos la cantidad de pixeles de cada color
+  (define (contarColores listaColores)
+    (define (contarColores-interno listaColores listaContador)
+      (if (null? listaColores)
+          listaContador
+          (contarColores-interno (cdr listaColores) (append listaContador (list (contarColor (car listaColores) listaColores))))
+          )
+      )
+    (contarColores-interno listaColores '())
+    )
+
+  ;Ahora creamos la lista con los pixeles y sus cantidades
+  (define (listaPixeles listaColores listaContador)
+    (define (listaPixeles-interno listaColores listaContador listaPixeles)
+      (if (null? listaColores)
+          listaPixeles
+          (listaPixeles-interno (cdr listaColores) (cdr listaContador) (append listaPixeles (list (list (car listaColores) (car listaContador)))))
+          )
+      )
+    (listaPixeles-interno listaColores listaContador '())
+    )
+
+  ;Ahora creamos la lista con los pixeles y sus cantidades
+  (listaPixeles (listaColores image) (contarColores (listaColores image)))
+  )
+;===============================================================
+
+;Funcion Rotate90
+;Descripción: Función que rota una imagen 90 grados en sentido horario.
+;Entradas: Imagen
+;Salida: Imagen rotada 90 grados en sentido horario.
+;Estrategia: Aplicar la formula -Y,X a cada pixel de la imagen.
+
+
+(define (aplicarFormula pixel)
+  (cons (- 0 (car(cdr pixel)))
+    (cons (car pixel) (cddr pixel)))
+  )
+
+
+;Ahora para el rotate90, usamos la funcion map para aplicar la formula a cada pixel
+(define (rotate90 image)
+  (map (lambda (pixel) (aplicarFormula pixel)) (getPixeles image))
+  )
+;===============================================================
+
+;Funcion que edita imagen.
+;Descripcion: Funcion que aplica funciones especiales a imagenes.
+;Entrada: Funcion, Imagen
+;Salida: Imagen
+
+(define (edit funct image)
+  (map (lambda (pixel) (funct pixel)) (getPixeles image)))
+
+
+;===============================================================
+
+;Funcion que invierte el bit
+;Descripcion: Funcion que invierte el bit a pixel, este en conjunto con edit lo cambia a todos.
+;Entrada: Pixel
+;Salida: Pixel
+
+(define (invertColorBit pixel)
+  (if (= (car (cddr pixel)) 0)
+      (cons (car pixel) (cons (car (cdr pixel)) (cons 1(cons (car(cdddr pixel)) '()))))
+      (cons (car pixel) (cons (car (cdr pixel)) (cons 0(cons (car(cdddr pixel)) '()))))))
 
 
 
@@ -235,7 +448,8 @@
 
 
 
-(require "TDA_Pixbit_20816739-1_VeraRamirez.rkt")
-(require "TDA_Pixrgb_20816739-1_VeraRamirez.rkt")
-(require "TDA_Pixhex_20816739-1_VeraRamirez.rkt")
+(require "TDA_Pixbit_20816739_VeraRamirez.rkt")
+(require "TDA_Pixrgb_20816739_VeraRamirez.rkt")
+(require "TDA_Pixhex_20816739_VeraRamirez.rkt")
+(require "TDA_Pixeles_20816739_VeraRamirez.rkt")
 (provide (all-defined-out))

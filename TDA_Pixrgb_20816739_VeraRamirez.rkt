@@ -50,21 +50,6 @@
 
 ;-------SELECTORES-------
 
-;Selector x
-;Descripción: Función que permite obtener el valor de x
-;Entradas: pixrgb
-;Salida: int
-
-(define (x data)
-  (car data))
-
-;Selector y
-;Descripción: Función que permite obtener el valor de y
-;Entradas: pixrgb
-;Salida: int
-
-(define (y data)
-  (car(cdr data)))
 
 ;Selector r
 ;Descripción: Función que permite obtener el valor de r

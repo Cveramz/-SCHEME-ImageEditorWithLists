@@ -1,9 +1,9 @@
 #lang scheme
 
-(require "TDA_Image_20816739-1_VeraRamirez.rkt")
-(require "TDA_Pixbit_20816739-1_VeraRamirez.rkt")
-(require "TDA_Pixrgb_20816739-1_VeraRamirez.rkt")
-(require "TDA_Pixhex_20816739-1_VeraRamirez.rkt")
+(require "TDA_Image_20816739_VeraRamirez.rkt")
+(require "TDA_Pixbit_20816739_VeraRamirez.rkt")
+(require "TDA_Pixrgb_20816739_VeraRamirez.rkt")
+(require "TDA_Pixhex_20816739_VeraRamirez.rkt")
 
 ;===============MIS PRUEBAS===============
 (display "============MIS PRUEBAS============\n")
@@ -102,7 +102,7 @@ mi-img5
 ;Modificador recortar imagen
 (display "Modificador recortar imagen:\n")
 (display "Ej mi-img1\n")
-(crop mi-img1 0 0 1 1)
+(crop mi-img1 0 0 0 1)
 (display "Ej mi-img2\n")
 (crop mi-img2 0 0 1 1)
 (display "Ej mi-img5\n")
